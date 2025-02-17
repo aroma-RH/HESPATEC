@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envoyer un message</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            margin-top: 40px;
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        select, input[type="text"], button {
+            font-size: 16px;
+            padding: 12px;
+            margin: 8px 0;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 15px;
+            width: 100%;
+            max-width: 420px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            padding: 40px 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 40px auto;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 24px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal-close {
+            background-color: #ccc;
+            color: black;
+        }
+
+        .modal-close:hover {
+            background-color: #888;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+
+            select, input[type="text"] {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>SUIVI HISPATEC EQUIPE</h2>
+
+    <div class="input-container">
+        <select id="work" name="work" required></select><br><br>
+    </div>
+
+    
+    <select id="equipe" name="equipe" required></select><br><br>
+    
+
+    <div class="input-container">
+        <input type="text" id="message" placeholder="Entrez votre matricule ici">
+    </div>
+
+    <button id="send">Envoyer</button>
+</div>
+
+
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3>Êtes-vous sûr de vouloir envoyer ce message ?</h3>
+        <button class="modal-button" id="confirmSend">Oui, envoyer</button>
+        <button class="modal-button modal-close" id="cancelSend">Annuler</button>
+    </div>
+</div>
+
+<script>
+
+
+
+
+
+const sendButton = document.getElementById("send");
+const messageInput = document.getElementById("message");
+const groupSelect = document.getElementById("equipe");
+const workSelect = document.getElementById("work");
+const confirmModal = document.getElementById("confirmModal");
+const confirmSend = document.getElementById("confirmSend");
+const cancelSend = document.getElementById("cancelSend");
+
+sendButton.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    const group = groupSelect.value;
+    const finca = workSelect.value;
+
+    if (!group || !finca) {
+        alert("Veuillez spécifier toutes les valeurs avant d'envoyer.");
+        return;
+    }
+
+    confirmModal.style.display = "block";
+});
+
+confirmSend.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    const group = groupSelect.value;
+    const work = workSelect.value;
+
+    const chatId = "-1002408201424";
+    const url = `https://api.telegram.org/bot7561853556:AAElzI6FYzNb6yNUV6EA_Bnzkec2hUrcP70/sendMessage`;
+
+    const formData = new FormData();
+    formData.append("chat_id", chatId);
+    formData.append("text", `${work}  >>> Equipe :${group}  ${message}`);
+
+    fetch(url, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            alert("Matricule envoyé avec succès!");
+        } else {
+            alert("Une erreur est survenue.");
+        }
+    })
+    .catch(error => console.error("Erreur lors de l'envoi du matricule:", error));
+
+ 
+    clearFields();
+
+    confirmModal.style.display = "none"; 
+});
+
+cancelSend.addEventListener("click", () => {
+    confirmModal.style.display = "none";
+    clearFields(); 
+});
+
+window.onclick = function(event) {
+    if (event.target == confirmModal) {
+        confirmModal.style.display = "none"; 
+        clearFields(); 
+    }
+};
+
+
+function clearFields() {
+    messageInput.value = '';  
+    groupSelect.selectedIndex = 0;  
+    workSelect.selectedIndex = 0;  
+}
+fetch('https://script.google.com/macros/s/AKfycbxoy923OwLPZA7S2wq5qOjcp8xA1IVc-28vxSMXDCqobxt9keI_NRfQLwe9E1Y1w12OoQ/exec')
+      .then(response => response.json())
+      .then(data => {
+        const comboBox = document.getElementById('equipe');
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          option.textContent = item;
+          comboBox.appendChild(option);
+        });
+      });
+
+      fetch('https://script.google.com/macros/s/AKfycbxZltUtOL7X9pWAjBKVcXctjmws5_LRZ1NFPdPrYADUUa31CJn9Y-1xnNUDFJ1IGub8/exec')
+      .then(response => response.json())
+      .then(data => {
+        const comboBox = document.getElementById('work');
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          option.textContent = item;
+          comboBox.appendChild(option);
+        });
+      });
+
+      $(document).ready(function() {
+            $('#equipe, #work').select2();
+        });
+</script>
+
+</body>
+</html>
